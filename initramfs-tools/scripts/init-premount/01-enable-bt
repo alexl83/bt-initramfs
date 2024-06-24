@@ -48,4 +48,4 @@ log_begin_msg "Starting dnsmasq on pan0"
 log_begin_msg "Starting PAN network"
 /usr/bin/bt-network -d -s nap pan0
 
-configure_networking
+#configure_networking
