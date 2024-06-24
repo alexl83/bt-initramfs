@@ -46,6 +46,6 @@ log_begin_msg "Starting dnsmasq on pan0"
 /usr/sbin/dnsmasq -C /etc/dnsmasq.conf 
 
 log_begin_msg "Starting PAN network"
-/usr/bin/bt-network -s nap pan0
+/usr/bin/bt-network -d -s nap pan0
 
 configure_networking
