@@ -1,0 +1,21 @@
+#!/bin/sh
+
+PREREQ=""
+prereqs()
+{
+    echo "${PREREQ}"
+}
+case "${1}" in
+    prereqs)
+        prereqs
+        exit 0
+        ;;
+esac
+
+
+echo "Killing services"
+/usr/bin/killall bt-network
+/usr/bin/kill $(cat /run/dnsmasq.pid)
+/sbin/ip link set dev pan0 down
+/sbin/ip/link del pan0
+/usr/bin/killall bt-agent -KILL

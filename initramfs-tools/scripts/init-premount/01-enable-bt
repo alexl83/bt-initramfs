@@ -1,0 +1,51 @@
+#!/bin/sh
+
+PREREQ=""
+prereqs()
+{
+    echo "${PREREQ}"
+}
+case "${1}" in
+    prereqs)
+        prereqs
+        exit 0
+        ;;
+esac
+
+. /scripts/functions
+
+ADAPTER="$(/usr/bin/bt-adapter -l | grep -Eo '([[:xdigit:]]{1,2}:){5}[[:xdigit:]]{1,2}')"
+
+log_begin_msg "Activating bt adapter"
+/usr/bin/bt-adapter -a $ADAPTER set Powered 1
+
+log_begin_msg "Setting bt friendly name"
+/usr/bin/bt-adapter -a $ADAPTER set Alias preboot
+
+log_begin_msg "Setting bt adapter discoverable"
+/usr/bin/bt-adapter set -a $ADAPTER Discoverable 1
+
+log_begin_msg "Setting bt adapter discoverable timout"
+/usr/bin/bt-adapter set -a $ADAPTER DiscoverableTimeout 180
+
+log_begin_msg "Setting bt adapter pairable"
+/usr/bin/bt-adapter set -a $ADAPTER Pairable 1
+
+log_begin_msg "Setting bt adapter pairing timeout"
+/usr/bin/bt-adapter set -a $ADAPTER PairableTimeout 180
+
+log_begin_msg "Starting bt-agent"
+/usr/bin/bt-agent -c NoInputNoOutput -d
+
+log_begin_msg "Setting up PAN bridge"
+/sbin/ip link add name pan0 type bridge
+/sbin/ip addr add 10.10.153.1/24 dev pan0
+/sbin/ip link set dev pan0 up
+
+log_begin_msg "Starting dnsmasq on pan0"
+/usr/sbin/dnsmasq -C /etc/dnsmasq.conf 
+
+log_begin_msg "Starting PAN network"
+/usr/bin/bt-network -s nap pan0
+
+configure_networking
